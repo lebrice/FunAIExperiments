@@ -29,16 +29,15 @@ class Board():
             [None for _ in range(width)]
             for _ in range(height)
         ]
-
         self.empty_cells: Set[Tuple[int, int]] = set(
-            (i, j) for i in range(height) for j in range(width))
+            (i, j) for i in range(height) for j in range(width)
+        )
         self.possibilities: List[List[Set[int]]] = [
             [
                 set(range(1, 10))
                 for _ in range(width)
             ] for _ in range(height)
         ]
-
         self._setup_state(grid)
 
     def _setup_state(self, grid):
@@ -66,35 +65,33 @@ class Board():
         We fill an empty spot on the board, and update the corresponding state buffers for the columns, rows, and squares.
         """
         # print(f"Writing the value {new_value} at position ({row}, {col})")
-        if new_value is not None:
-            assert (row, col) in self.empty_cells
-            assert self.grid[row][col] is None
-            assert new_value in self.possibilities[row][col]
+        assert new_value is not None, "Erasing a value isnt implemented yet."
+        assert (row, col) in self.empty_cells
+        assert self.grid[row][col] is None
+        assert new_value in self.possibilities[row][col]
 
-            self.grid[row][col] = new_value
-            self.empty_cells.discard((row, col))
+        self.grid[row][col] = new_value
+        self.empty_cells.discard((row, col))
 
-            # update the possible values in the squares of the same column
-            for i in range(self.height):
-                self.possibilities[i][col].discard(new_value)
+        # update the possible values in the squares of the same column
+        for i in range(self.height):
+            self.possibilities[i][col].discard(new_value)
 
-            # update the possible values in the squares of the same row
-            for j in range(self.width):
-                self.possibilities[row][j].discard(new_value)
+        # update the possible values in the squares of the same row
+        for j in range(self.width):
+            self.possibilities[row][j].discard(new_value)
 
-            # update the possible values in the same square
-            for i in range((row // 3 * 3), (row // 3 + 1) * 3):
-                for j in range((col // 3 * 3), ((col // 3 + 1) * 3)):
-                    if self.grid[i][j] is None:
-                        self.possibilities[i][j].discard(new_value)
-
-        else:
-            raise NotImplementedError("Erasing a value isnt implemented yet.")
+        # update the possible values in the same square
+        for i in range((row // 3 * 3), (row // 3 + 1) * 3):
+            for j in range((col // 3 * 3), ((col // 3 + 1) * 3)):
+                if self.grid[i][j] is None:
+                    self.possibilities[i][j].discard(new_value)
 
     def obvious_move(self) -> Optional[Tuple[int, int, int]]:
         for (row, col) in self.empty_cells:
             if len(self.possibilities[row][col]) == 1:
-                value = next(iter(self.possibilities[row][col]))
+                # we don't want to remove it just yet, just return it.
+                value = next(iter(self.possibilities[row][col])) 
                 return row, col, value
         return None
 
